@@ -4,22 +4,22 @@ var crypto = require('crypto')
 
 async function app(github, context, exec) {
     console.log("DATE------in app")
-    const dateTimeStr = new Date().toLocaleString("us-EN", { timeZone: "Europe/Oslo" })
-    const date = new Date(dateTimeStr)
-    const year = date.getFullYear()
-    const month =date.getMonth() + 1
-    const day = date.getDay() + 1
+    const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
+    const parts = dateTimeStr.split(".")
+    const day =  Number(parts[0])
+    const month = Number(parts[1])
+    const year = Number(parts[2])
 
     console.log("DATE-------", dateTimeStr, date, year, month, day)
     if( year == 2022 && month == 12){
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
-        const files = files(day)
+        const files = fileContents(day)
         files.forEach((file) => addFile(github, context, file.path, file.content, targetBrahch))
     }   
 }
 
-const files = (day) => [
+const fileContents = (day) => [
     { 
         "path": `day${day}/input.txt`,
         "content": "input"
