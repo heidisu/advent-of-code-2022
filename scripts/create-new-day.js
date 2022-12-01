@@ -1,7 +1,4 @@
 
-const { Console } = require('console')
-var crypto = require('crypto')
-
 async function app(github, context, exec) {
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const parts = dateTimeStr.split(".")
@@ -31,17 +28,17 @@ const fileContents = (day) => [
     { 
         "path": `day${day}/day${day}.fsx`,
         "content": `
-        open System.IO
+open System.IO
 
-        let readFile () = 
-            File.ReadLines "input.txt"
-            |> Seq.toList
-        
-        let task1 = "task 1"
-        let task2 = "task 2"
-        
-        printfn $"Task 1: {task1}"
-        printfn $"Task 2: {task2}"
+let readFile () = 
+    File.ReadLines "input.txt"
+    |> Seq.toList
+
+let task1 = "task 1"
+let task2 = "task 2"
+
+printfn $"Task 1: {task1}"
+printfn $"Task 2: {task2}"
         `
     }
 ]
