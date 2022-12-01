@@ -10,7 +10,7 @@ async function app(github, context, exec) {
     const month = Number(parts[1])
     const year = Number(parts[2])
 
-    console.log("DATE-------", dateTimeStr, year, month, day)
+    console.log("DATE-------", dateTimeStr, parts, year, month, day)
     if( year == 2022 && month == 12){
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
