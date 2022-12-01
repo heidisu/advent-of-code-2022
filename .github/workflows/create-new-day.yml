@@ -14,5 +14,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const script = require('scripts/create-new-day.js')
+            const script = require('./scripts/create-new-day.js')
             script(github, context, exec)
