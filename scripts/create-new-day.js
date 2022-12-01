@@ -1,13 +1,16 @@
 
+const { Console } = require('console')
 var crypto = require('crypto')
 
 async function app(github, context, exec) {
+    console.log("DATE------in app")
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const date = new Date(dateTimeStr)
     const year = date.getFullYear()
     const month =date.getMonth() + 1
     const day = date.getDate() + 1
 
+    console.log("DATE-------", dateTimeStr, date, year, month, day)
     if( year == 2022 && month == 12){
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
