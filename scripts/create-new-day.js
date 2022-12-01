@@ -3,14 +3,12 @@ const { Console } = require('console')
 var crypto = require('crypto')
 
 async function app(github, context, exec) {
-    console.log("DATE------in app")
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const parts = dateTimeStr.split(".")
     const day =  Number(parts[0])
     const month = Number(parts[1])
     const year = Number(parts[2].substring(0,4))
 
-    console.log("DATE-------", dateTimeStr, parts, year, month, day)
     if( year == 2022 && month == 12){
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
@@ -65,7 +63,7 @@ async function addFile(github, context, filePath, fileContent, targetBranch) {
         repo: context.repo.repo,
         path: filePath,
         message: `Added file ${filePath}`,
-        content: btoa(fileContent),
+        content: Buffer.from(fileContent).toString('base64'),
         branch: targetBranch
     })
 }
