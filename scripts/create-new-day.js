@@ -8,7 +8,7 @@ async function app(github, context, exec) {
     const parts = dateTimeStr.split(".")
     const day =  Number(parts[0])
     const month = Number(parts[1])
-    const year = Number(parts[2])
+    const year = Number(parts[2].substring(0,4))
 
     console.log("DATE-------", dateTimeStr, parts, year, month, day)
     if( year == 2022 && month == 12){
