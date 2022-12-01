@@ -1,4 +1,6 @@
 
+var crypto = require('crypto')
+
 async function app(github, context, exec) {
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const date = new Date(dateTimeStr)
@@ -55,13 +57,12 @@ async function createNewBranchAndPushItToRemote(exec, targetBranch) {
 }
 
 async function addFile(github, context, filePath, fileContent, targetBranch) {
-    const base64Encoded = Buffer.from(fileContent).toString('base64')
     await github.rest.repos.createOrUpdateFileContents({
         owner: context.repo.owner,
         repo: context.repo.repo,
         path: filePath,
         message: `Added file ${filePath}`,
-        content: base64Encoded,
+        content: btoa(fileContent),
         branch: targetBranch
     })
 }
