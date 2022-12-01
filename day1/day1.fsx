@@ -21,4 +21,4 @@ let task2 =
 
 
 printfn $"Task 1: {task1}" // 66306
-printfn $"Task 2 {task2}" // 195292
+printfn $"Task 2: {task2}" // 195292
