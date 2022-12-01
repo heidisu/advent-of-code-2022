@@ -4,7 +4,7 @@ async function app(github, context, exec) {
     const date = new Date(dateTimeStr)
     const year = date.getFullYear()
     const month =date.getMonth() + 1
-    const day = date.getDate()
+    const day = date.getDate() + 1
 
     if( year == 2022 && month == 12){
         const targetBrahch = getTargetBranch(day)
