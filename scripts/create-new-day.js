@@ -11,7 +11,7 @@ async function app(github, context, exec) {
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
         const files = fileContents(day)
         await addFile(exec, github, context, `day${day}/input.txt`, `day${day}/input.txt`, targetBrahch)
-        await addFile(exec, github, context, `day${day}/test-input.txt`, `day${day}/test-input.txt`, targetBrahch))
+        await addFile(exec, github, context, `day${day}/test-input.txt`, `day${day}/test-input.txt`, targetBrahch)
     }   
 }
 
