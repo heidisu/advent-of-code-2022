@@ -2,7 +2,7 @@
 async function app(github, context, exec) {
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const parts = dateTimeStr.split(".")
-    const day =  Number(parts[0])
+    const day =  Number(parts[0]) + 1
     const month = Number(parts[1])
     const year = Number(parts[2].substring(0,4))
 
@@ -10,7 +10,7 @@ async function app(github, context, exec) {
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
         const files = fileContents(day)
-        files.forEach((file) => addFile(github, context, file.path, file.content, targetBrahch))
+        files.forEach((file) => addFile(exec, github, context, file.path, file.content, targetBrahch))
     }   
 }
 
@@ -54,7 +54,7 @@ async function createNewBranchAndPushItToRemote(exec, targetBranch) {
     }
 }
 
-async function addFile(github, context, filePath, fileContent, targetBranch) {
+async function addFile(exec, github, context, filePath, fileContent, targetBranch) {
     await github.rest.repos.createOrUpdateFileContents({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -63,6 +63,7 @@ async function addFile(github, context, filePath, fileContent, targetBranch) {
         content: Buffer.from(fileContent).toString('base64'),
         branch: targetBranch
     })
+    await exec.exec("git", ["pull", targetBranch])
 }
 
 module.exports = async (github, context, exec) => {
