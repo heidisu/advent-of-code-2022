@@ -2,7 +2,7 @@
 async function app(github, context, exec) {
     const dateTimeStr = new Date().toLocaleString("nb-NO", { timeZone: "Europe/Oslo" })
     const parts = dateTimeStr.split(".")
-    const day =  Number(parts[0]) + 1
+    const day =  Number(parts[0])
     const month = Number(parts[1])
     const year = Number(parts[2].substring(0,4))
 
