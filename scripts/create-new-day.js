@@ -10,25 +10,13 @@ async function app(github, context, exec) {
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
         const files = fileContents(day)
-        await addFile(exec, github, context, `day${day}/input.txt`, `day${day}/input.txt`, targetBrahch)
-        await addFile(exec, github, context, `day${day}/test-input.txt`, `day${day}/test-input.txt`, targetBrahch)
+        await addFile(github, context, `day${day}/input.txt`, `day${day}/input.txt`, targetBrahch)
+        await addFile(github, context, `day${day}/test-input.txt`, `day${day}/test-input.txt`, targetBrahch)
+        await addFile(github, context, `day${day}/day${day}.fsx`, fsxFileContent, targetBrahch)
     }   
 }
 
-const fileContents = (day) => [
-    { 
-        "path": `day${day}/input.txt`,
-        "content": `day${day}/input.txt`
-
-    },
-    { 
-        "path": `day${day}/test-input.txt`,
-        "content": "test-input"
-
-    },
-    { 
-        "path": `day${day}/day${day}.fsx`,
-        "content": `
+const fsxFileContent = `
 open System.IO
 
 let readFile () = 
@@ -40,9 +28,8 @@ let task2 = "task 2"
 
 printfn $"Task 1: {task1}"
 printfn $"Task 2: {task2}"
-        `
-    }
-]
+`
+
 
 const getTargetBranch = (day) => `day-${day}`
 
@@ -55,7 +42,7 @@ async function createNewBranchAndPushItToRemote(exec, targetBranch) {
     }
 }
 
-async function addFile(exec, github, context, filePath, fileContent, targetBranch) {
+async function addFile(github, context, filePath, fileContent, targetBranch) {
     await github.rest.repos.createOrUpdateFileContents({
         owner: context.repo.owner,
         repo: context.repo.repo,
