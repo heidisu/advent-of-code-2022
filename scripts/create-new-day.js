@@ -10,14 +10,15 @@ async function app(github, context, exec) {
         const targetBrahch = getTargetBranch(day)
         await createNewBranchAndPushItToRemote(exec, targetBrahch)
         const files = fileContents(day)
-        files.forEach((file) => addFile(exec, github, context, file.path, file.content, targetBrahch))
+        addFile(exec, github, context, `day${day}/input.txt`, `day${day}/input.txt`, targetBrahch)
+        addFile(exec, github, context, `day${day}/test-input.txt`, `day${day}/test-input.txt`, targetBrahch))
     }   
 }
 
 const fileContents = (day) => [
     { 
         "path": `day${day}/input.txt`,
-        "content": "input"
+        "content": `day${day}/input.txt`
 
     },
     { 
@@ -63,7 +64,6 @@ async function addFile(exec, github, context, filePath, fileContent, targetBranc
         content: Buffer.from(fileContent).toString('base64'),
         branch: targetBranch
     })
-    await exec.exec("git", ["pull", targetBranch])
 }
 
 module.exports = async (github, context, exec) => {
