@@ -1,15 +1,15 @@
 name: Create new day
 on: 
-  push:
-    branches:
-      - test-workflow
+  schedule:
+    - cron:  '0 1 * * *'
+
 jobs:
   create-new-day:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: test-workflow
+          ref: main
       - uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
