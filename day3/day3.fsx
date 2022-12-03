@@ -14,7 +14,7 @@ let task1 =
     |> List.map (fun l -> 
         let half = (List.length l) / 2
         (List.take half l, List.skip half l))
-    |> List.map (fun (a, b)-> Set.intersect Set(a) Set(b))
+    |> List.map (fun (a, b)-> (Set(a), Set(b)))
     |> List.map (fun (a, b) -> Set.intersect a b)
     |> List.map (fun s -> s |> Set.toList |> List.head)
     |> List.map charToNum
@@ -29,5 +29,6 @@ let task2 =
     |> List.map (fun s -> s |> Set.toList |> List.head)
     |> List.map charToNum 
     |> List.sum
+
 printfn $"Task 1: {task1}" // 7428
 printfn $"Task 2: {task2}" // 2650
