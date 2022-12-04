@@ -1,5 +1,7 @@
 # Advent of code 2022
 
+[![test days](https://github.com/heidisu/advent-of-code-2022/actions/workflows/test-days.yml/badge.svg)](https://github.com/heidisu/advent-of-code-2022/actions/workflows/test-days.yml)
+
 https://adventofcode.com/2022
 
 | Day                      | Title                                                              | Keywords                                            | Progress |
