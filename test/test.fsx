@@ -38,4 +38,5 @@ let tests =
         testDay 1 66306 195292
         testDay 2 66306 195292
     ]
-runTestsWithCLIArgs [] [||] tests
+let exitcode = runTestsWithCLIArgs [] [||] tests
+exit exitcode
