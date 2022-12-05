@@ -23,18 +23,19 @@ let testDay day task1expected task2expected =
     Expect.equal exitCode 0 "Program runs ok"
     let stringTrimmed = output.Replace("Task 1:", "").Replace("Task 2:", "").Trim()
     let taskResults = stringTrimmed.Split(" ")
-    let task1 = int taskResults[0]
-    let task2 = int taskResults[1]
+    let task1 = taskResults[0]
+    let task2 = taskResults[1]
     Expect.equal task1 task1expected "Task 1 has expected result"
     Expect.equal task2 task2expected "Task 2 has expected result"
   }
 
 let tests =
     testList "Test all days" [
-        testDay 1 66306 195292
-        testDay 2 12855 13726
-        testDay 3 7428 2650
-        testDay 4 567 907
+        testDay 1 "66306" "195292"
+        testDay 2 "12855" "13726"
+        testDay 3 "7428" "2650"
+        testDay 4 "567" "907"
+        testDay 5 "MQTPGLLDN" "LVZPSTTCZ"
     ]
 let exitcode = runTestsWithCLIArgs [] [||] tests
 exit exitcode
