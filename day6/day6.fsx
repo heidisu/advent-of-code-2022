@@ -10,7 +10,7 @@ let search messageSize input =
     |> Seq.indexed
     |> Seq.find (fun (i, chars) -> Set(chars).Count = messageSize)
     |> fst
-    |> (fun idx -> idx + messageSize)
+    |> (+) messageSize
 
 let task1 = 
     readFile()
