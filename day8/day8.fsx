@@ -35,29 +35,30 @@ let isVisible (trees: int array array) size i j =
         visibleHor || visibleVer
 
 let rec searchLeft (trees: int array array) prev count i j = 
-    if i = 0 || trees[i][j] < prev then count
+    if i < 0 || trees[i][j] <= prev then count
     else searchLeft trees (trees[i][j]) (count + 1) (i - 1) j
 
 let rec searchRight (trees: int array array) prev count i j = 
-    if i = (Array.length trees - 1)  || trees[i][j] < prev then count
+    if i > (Array.length trees - 1)  || trees[i][j] <= prev then count
     else searchRight trees (trees[i][j]) (count + 1) (i + 1) j
 
 let rec searchUp (trees: int array array) prev count i j = 
-    if j = 0 || trees[i][j] < prev then count
+    if j < 0 || trees[i][j] <= prev then count
     else searchUp trees (trees[i][j]) (count + 1) i (j - 1)
 
 let rec searchDown (trees: int array array) prev count i j = 
-    if j = (Array.length trees - 1)  || trees[i][j] < prev then count
+    if j > (Array.length trees - 1)  || trees[i][j] <= prev then count
     else searchDown trees (trees[i][j]) (count + 1) i (j + 1)
 
 let scenicScore (trees: int array array) i j = 
-    let size = Array.length trees
+    let size = Array.length trees 
     if i = 0 || i = (size - 1) || j = 0 || j = (size - 1) then 0
     else 
-        let left = searchLeft trees (trees[i][j]) 1 (i - 1) j
-        let right = searchRight trees (trees[i][j]) 1 (i + 1) j
-        let up = searchUp trees (trees[i][j]) 1 i (j - 1)
-        let down = searchDown trees (trees[i][j]) 1 i (j + 1)
+        let left = searchLeft trees 0  0 (i) j
+        let right = searchRight trees 0  0 (i) j
+        let up = searchUp trees 0  0 i (j)
+        let down = searchDown trees 0   0 i (j)
+        printfn $"i:{i} j:{j} l: {left} r: {right} u: {up} d: {down}"
         left * right * up * down
 
 let trees =
@@ -77,10 +78,12 @@ let task1 =
 
 let task2  = 
     trees
-    |> Array.mapi (fun i a -> a |> Array.mapi (fun j aa -> ((i, j), scenicScore trees i j)))
+    |> Array.mapi (fun i a -> a |> Array.mapi (fun j aa -> ((i, j), trees[i][j], scenicScore trees i j)))
     |> Array.map Array.toList
     |> Array.toList
     |> List.collect id
+  //  |> List.map (fun (i, j, l) -> l)
+  //  |> List.max
 printfn $"Task 1: {task1}" // 1870
 printfn $"Task 2: {task2}"
 for v in task2 do printfn "%A" v
