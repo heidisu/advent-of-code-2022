@@ -13,6 +13,6 @@ https://adventofcode.com/2022
 | [Day 5](day5/day5.fsx) | [Supply Stacks](https://adventofcode.com/2022/day/5)     |     | ⭐⭐ |
 | [Day 6](day6/day6.fsx) | [Tuning Trouble](https://adventofcode.com/2022/day/6)     | windowing   | ⭐⭐ |
 | [Day 7](day7/day7.fsx) | [No Space Left On Device](https://adventofcode.com/2022/day/7)     | file system | ⭐⭐ |
-| [Day 8](day8/day8.fsx) | [](https://adventofcode.com/2022/day/8)     | 
-| [Day 9](day9/day9.fsx) | [](https://adventofcode.com/2022/day/9)     | 
+| [Day 8](day8/day8.fsx) | [Treetop Tree House](https://adventofcode.com/2022/day/8)     | 2d map | ⭐⭐ |
+| [Day 9](day9/day9.fsx) | [Rope Bridge](https://adventofcode.com/2022/day/9)     | coordinates | ⭐⭐ |
 | [Day 10](day10/day10.fsx) | [](https://adventofcode.com/2022/day/10)     | 
