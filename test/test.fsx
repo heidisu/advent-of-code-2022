@@ -39,6 +39,7 @@ let tests =
         testDay 6 "1300" "3986"
         testDay 7 "1749646" "1498966"
         testDay 8 "1870" "517440"
+        testDay 9 "6067" "2471"
     ]
 let exitcode = runTestsWithCLIArgs [] [||] tests
 exit exitcode
