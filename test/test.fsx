@@ -21,7 +21,8 @@ let testDay day task1expected task2expected =
     test $"Test day {day}" {
     let (exitCode, output) = executeProcess "dotnet" $"day{day}" ["fsi"; $"day{day}.fsx"]
     Expect.equal exitCode 0 "Program runs ok"
-    let stringTrimmed = output.Replace("Task 1:", "").Replace("Task 2:", "").Trim()
+    let task1Idx = output.IndexOf("Task 1")
+    let stringTrimmed = output.Substring(task1Idx).Replace("Task 1:", "").Replace("Task 2:", "").Trim()
     let taskResults = stringTrimmed.Split(" ")
     let task1 = taskResults[0]
     let task2 = taskResults[1]
@@ -40,6 +41,7 @@ let tests =
         testDay 7 "1749646" "1498966"
         testDay 8 "1870" "517440"
         testDay 9 "6067" "2471"
+        testDay 10 "14920" "BUCACBUZ"
     ]
 let exitcode = runTestsWithCLIArgs [] [||] tests
 exit exitcode
