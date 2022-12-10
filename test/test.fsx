@@ -21,7 +21,8 @@ let testDay day task1expected task2expected =
     test $"Test day {day}" {
     let (exitCode, output) = executeProcess "dotnet" $"day{day}" ["fsi"; $"day{day}.fsx"]
     Expect.equal exitCode 0 "Program runs ok"
-    let stringTrimmed = output.Replace("Task 1:", "").Replace("Task 2:", "").Trim()
+    let task1Idx = output.IndexOf("Task 1")
+    let stringTrimmed = output.Substring(task1Idx).Replace("Task 1:", "").Replace("Task 2:", "").Trim()
     let taskResults = stringTrimmed.Split(" ")
     let task1 = taskResults[0]
     let task2 = taskResults[1]
