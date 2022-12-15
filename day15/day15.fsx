@@ -15,15 +15,27 @@ let parseLine (line: string) =
 
 let withinDistance (y: int) sensor manhattan =
     let (a, b) = sensor
-    let z = abs(b - y)
-    (a - manhattan + z, manhattan - z - a)
+    let z = manhattan - abs(b - y)
+    (a - z, z + a)
 
 let readFile () = 
-    File.ReadLines "test-input.txt"
-    |> Seq.toList
-    |> List.map parseLine
-    |> List.map (fun (s,  b, m) -> withinDistance 10 s m)
-    |> List.skip 3
+    let items = 
+        File.ReadLines "test-input.txt"
+        |> Seq.toList
+        |> List.map parseLine
+    
+    let idx = 10
+    let count = 
+        items
+        |> List.map (fun (s,  b, m) -> withinDistance idx s m)
+        |> List.map (fun (a, b) -> [a .. b] |> Set.ofList)
+        |> List.fold (fun acc s -> Set.union acc s) Set.empty
+        |> Set.count
+    let beacons = 
+        items
+        |> List.filter (fun (s, b, m) -> snd b = idx)
+        |> List.length
+    count - beacons
 
 let task1 =
     readFile ()
