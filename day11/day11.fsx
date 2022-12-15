@@ -7,9 +7,9 @@ let readFile () =
 
 type Monkey = {
     Id: int
-    Items:bigint list
-    Operation: bigint-> bigint
-    Test: bigint -> bool
+    Items:int list
+    Operation: int-> int
+    Test: int -> bool
     IfTrue: int
     IfFalse: int
 }
@@ -17,50 +17,79 @@ type Monkey = {
 let testMonkeys = [|
     { 
         Id = 0
-        Items = [79L; 98L]
-        Operation = fun x -> x * (bigint 19)
-        Test = fun x -> x % (bigint 23) = 0
+        Items = [79; 98]
+        Operation = fun x -> x * 19
+        Test = fun x -> x % 23 = 0
         IfTrue = 2
         IfFalse = 3
     }
     { 
         Id = 1
-        Items = [54L; 65L; 75L; 74L]
-        Operation = fun x -> x + (bigint 6)
-        Test = fun x -> x % (bigint 19) = 0
+        Items = [54; 65; 75; 74]
+        Operation = fun x -> x + 6
+        Test = fun x -> x % 19 = 0
         IfTrue = 2
         IfFalse = 0
     }
     { 
         Id = 2
-        Items = [79L; 60L; 97L]
+        Items = [79; 60; 97]
         Operation = fun x -> x * x
-        Test = fun x -> x % (bigint 13) = 0
+        Test = fun x -> x % 13 = 0
         IfTrue = 1
         IfFalse = 3
     }
     { 
         Id = 3
-        Items = [74L]
-        Operation = fun x -> x + (bigint 3)
-        Test = fun x -> x % (bigint 17) = 0
+        Items = [74]
+        Operation = fun x -> x + 3
+        Test = fun x -> x % 17 = 0
         IfTrue = 0
         IfFalse = 1
     }
 |]
 
-type Operation = Double | Muliply of int | Add of int
+let visitedItems = Array.create 8 0
+
+let play (monkeys: Monkey array) (monkey: Monkey) = 
+    monkey.Items
+    |> List.iter (fun i -> 
+        let worryLevel = (monkey.Operation i) / 3
+        //printfn "%A" worryLevel
+        let toMonkey = if monkey.Test worryLevel then monkey.IfTrue else monkey.IfFalse
+        let newMonkey = monkeys[toMonkey]
+        monkeys[toMonkey] <- { newMonkey with Items = newMonkey.Items @ [worryLevel]}
+        visitedItems[monkey.Id] <- visitedItems[monkey.Id] + 1
+    )
+    { monkey with Items = []}
+
+let round monkeys = 
+    for i in 0 .. Array.length monkeys - 1 do
+        monkeys[i] <- play monkeys monkeys[i]
+
+let task1 = 
+    for i in 1 .. 20 do
+        round testMonkeys
+    visitedItems
+    |> Array.toList
+    |> List.mapi (fun i visited -> (i, visited))
+    |> List.sortByDescending (fun (i, tot) -> tot)
+    |> fun l -> (snd l[0]) * (snd l[1])
+
+
+
+type Operation = Double | Multiply of int | Add of int
 
 type Monkey2 = {
     Id: int
-    Items: map list
+    Items: Map<int, int> list
     Operation: Operation
     Test: int
     IfTrue: int
     IfFalse: int
 }
 
-let testMonkeys: Monkey2 array = [|
+let testMonkeys2: Monkey2 array = [|
     { 
         Id = 0
         Items = [Map.ofList [(79, 1)]; Map.ofList [(2, 1); (7, 2)]]
@@ -75,16 +104,16 @@ let testMonkeys: Monkey2 array = [|
             Map.ofList [(3, 1); (2, 3)]
             Map.ofList [(5, 1); (13, 1)]
             Map.ofList [(3, 1); (5, 2)]
-            54L; 65L; 75L; 74L
+            //54L; 65L; 75L; 74L
             ]
-        Operation = fun x -> Add 6
+        Operation = Add 6
         Test = 19
         IfTrue = 2
         IfFalse = 0
     }
     { 
         Id = 2
-        Items = [79L; 60L; 97L]
+        Items = [] //79L; 60L; 97L]
         Operation = Double
         Test = 13
         IfTrue = 1
@@ -92,7 +121,7 @@ let testMonkeys: Monkey2 array = [|
     }
     { 
         Id = 3
-        Items = [74L]
+        Items = [] //74L]
         Operation = Add 3
         Test = 17
         IfTrue = 0
@@ -108,6 +137,7 @@ let monkeyItems: bigint list array  = [|
      [74L]
 |]*)
 
+(*
 let prodMonkeys: Monkey array = [|
     {
         Id = 0
@@ -184,8 +214,9 @@ let prodMonkeyItems: bigint list array = [|
     [66; 64; 68; 92; 68; 77]
     [97; 94; 79; 88]
     [77; 85]
-|]
+|] *)
 
+(*
 let foo : (int * bigint) list array = Array.create 10001 []
 
 foo[0] <- [
@@ -199,22 +230,10 @@ foo[0] <- [
     (5, 66); (5, 64); (5, 68); (5, 92); (5, 68); (5, 77)
     (6, 97); (6, 94); (6, 79); (6, 88)
     (7, 77); (7, 85)
-]
+]*)
 
 
-let visitedItems = Array.create 8 0
-
-let play (monkeys: Monkey array) (monkey: Monkey) = 
-    monkey.Items
-    |> List.iter (fun i -> 
-        let worryLevel = (monkey.Operation i) / (bigint 3)
-        //printfn "%A" worryLevel
-        let toMonkey = if monkey.Test worryLevel then monkey.IfTrue else monkey.IfFalse
-        let newMonkey = monkeys[toMonkey]
-        monkeys[toMonkey] <- { newMonkey with Items = newMonkey.Items @ [worryLevel]}
-        visitedItems[monkey.Id] <- visitedItems[monkey.Id] + 1
-    )
-    { monkey with Items = []}
+(*
 
 let play2 round (monkey: Monkey) = 
     // printfn "Round %A" round
@@ -250,17 +269,16 @@ let play2 round (monkey: Monkey) =
     // visitedItems[monkey.Id] <- visitedItems[monkey.Id] + List.length levels
     // prodMonkeyItems[monkey.Id] <- []
 
-let round monkeys = 
-    for i in 0 .. Array.length monkeys - 1 do
-        monkeys[i] <- play monkeys monkeys[i]
+
 
 let round2 round monkeys = 
     for i in 0 .. Array.length monkeys - 1 do
         play2 round monkeys[i]
+        *)
 
-let task1 = 
+(*let task1 = 
     for i in 1 .. 10000 do
-        round2 i prodMonkeys
+        round2 i testMonkeys
         if i % 100 = 0 then printfn "%A %A" i visitedItems
     testMonkeys
     |> Array.map (fun m -> m.Items)
@@ -270,6 +288,7 @@ let task1 =
     |> List.mapi (fun i visited -> (i, visited))
     |> List.sortByDescending (fun (i, tot) -> tot)
     |> fun l -> int64(snd l[0]) * int64(snd l[1])
+*)
 
 let task2 = "task 2"
 
