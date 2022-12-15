@@ -20,26 +20,27 @@ let withinDistance (y: int) sensor manhattan =
 
 let readFile () = 
     let items = 
-        File.ReadLines "test-input.txt"
+        File.ReadLines "input.txt"
         |> Seq.toList
         |> List.map parseLine
     
-    let idx = 10
-    let count = 
+    let idx = 2000000
+    let points = 
         items
         |> List.map (fun (s,  b, m) -> withinDistance idx s m)
         |> List.map (fun (a, b) -> [a .. b] |> Set.ofList)
         |> List.fold (fun acc s -> Set.union acc s) Set.empty
-        |> Set.count
     let beacons = 
         items
-        |> List.filter (fun (s, b, m) -> snd b = idx)
+        |> List.map (fun (s, b, m) -> b)
+        |> List.filter (fun (x, y) -> y = idx && Set.contains x points)
+        |> List.distinct
         |> List.length
-    count - beacons
+    (Set.count points) - beacons
 
 let task1 =
     readFile ()
 let task2 = "task 2"
 
-printfn $"Task 1: {task1}"
+printfn $"Task 1: {task1}" // 5240818
 printfn $"Task 2: {task2}"
