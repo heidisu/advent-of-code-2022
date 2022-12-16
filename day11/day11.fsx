@@ -1,5 +1,8 @@
 
 open System.IO
+open System
+open System.Collections.Generic
+
 
 let readFile () = 
     File.ReadLines "input.txt"
@@ -82,17 +85,60 @@ type Operation = Double | Multiply of int | Add of int
 
 type Monkey2 = {
     Id: int
-    Items: Map<int, int> list
     Operation: Operation
     Test: int
     IfTrue: int
     IfFalse: int
 }
 
+let primeFactors: Dictionary<int, Map<int, int>> = Dictionary()
+
+let rec factorize (acc: int list) (num: int) (div: int) = 
+    if div > num then acc 
+    else
+        if num % div = 0 then factorize (div :: acc) (num / div) div
+        else factorize acc num (div  + 1)
+
+let rec bigFactor (acc: int list) (num: bigint) (div: bigint) = 
+    if div > num then acc 
+    else
+        if num % div = bigint 0 then bigFactor (int div :: acc) (num / div) div
+        else bigFactor acc num (div  + bigint 1)
+
+printfn "%A" (factorize [] 74 2)
+printfn "%A" (factorize [] 2356 2)
+
+let getOrAddPrime num : Map<int, int> = 
+    if primeFactors.ContainsKey num then primeFactors.Item num 
+    else 
+        let factors = 
+            factorize [] num 2
+            |> List.groupBy id
+            |> List.map (fun (n, l) -> (n, List.length l))
+            |> Map.ofList
+        primeFactors.Add(num, factors)
+        factors
+
+let add (num: int) (mp: Map<int, int>) = 
+    let factors = factorize  [] num 2
+    mp
+    (*let mpToBigint =
+        mp
+        |> Map.toList
+        |> List.map (fun (a, b) ->  pown a b)
+        |> List.fold (fun s a -> s * (bigint a)) (bigint 1)
+    let total = (bigint num) + mpToBigint
+    let res = 
+        bigFactor [] total (bigint 2)
+        |> List.groupBy id
+        |> List.map (fun (n, l) -> (n, List.length l))
+        |> Map.ofList
+        *)
+    //printfn "%A %A %A %A" num mp mpNum res
+
 let testMonkeys2: Monkey2 array = [|
     { 
         Id = 0
-        Items = [Map.ofList [(79, 1)]; Map.ofList [(2, 1); (7, 2)]]
         Operation = Multiply 19
         Test = 23
         IfTrue = 2
@@ -100,12 +146,6 @@ let testMonkeys2: Monkey2 array = [|
     }
     { 
         Id = 1
-        Items = [
-            Map.ofList [(3, 1); (2, 3)]
-            Map.ofList [(5, 1); (13, 1)]
-            Map.ofList [(3, 1); (5, 2)]
-            //54L; 65L; 75L; 74L
-            ]
         Operation = Add 6
         Test = 19
         IfTrue = 2
@@ -113,7 +153,6 @@ let testMonkeys2: Monkey2 array = [|
     }
     { 
         Id = 2
-        Items = [] //79L; 60L; 97L]
         Operation = Double
         Test = 13
         IfTrue = 1
@@ -121,13 +160,74 @@ let testMonkeys2: Monkey2 array = [|
     }
     { 
         Id = 3
-        Items = [] //74L]
         Operation = Add 3
         Test = 17
         IfTrue = 0
         IfFalse = 1
     }
 |]
+
+let monkeyItems =  Array.create 8 []
+monkeyItems[0] <- [
+    getOrAddPrime 79
+    getOrAddPrime 98
+]
+
+monkeyItems[1] <- [
+    getOrAddPrime 54
+    getOrAddPrime 65
+    getOrAddPrime 75
+    getOrAddPrime 74
+]
+
+monkeyItems[2] <- [
+    getOrAddPrime 79
+    getOrAddPrime 60
+    getOrAddPrime 97
+]
+
+monkeyItems[3] <- [
+    getOrAddPrime 74
+]
+
+let visitedItems2 = Array.create 8 0
+
+let play2 (monkey: Monkey2) = 
+    let items = monkeyItems[monkey.Id]
+    let num = items.Length
+    items
+    |> List.iter (fun i -> 
+        let worryLevel: Map<int, int> = 
+            match  monkey.Operation with
+            | Double -> i |> Map.toList |> List.map (fun (n, i) -> (n, 2 * i)) |> Map.ofList
+            | Multiply m -> 
+                Map.change m (fun x -> 
+                    match x with
+                    | Some v -> Some (v + 1)
+                    | None -> Some 1
+                    ) i
+            | Add n -> add n i
+        let toMonkey = if worryLevel.ContainsKey monkey.Test then monkey.IfTrue else monkey.IfFalse
+        monkeyItems[toMonkey] <- monkeyItems[toMonkey] @ [worryLevel]
+    )
+    monkeyItems[monkey.Id] <- []
+    visitedItems[monkey.Id] <- visitedItems[monkey.Id] + num
+
+let round2 (monkeys: Monkey2 array) = 
+    for i in 0 .. Array.length monkeys - 1 do
+        play2 monkeys[i]
+
+let task2 =
+    for i in 1 .. 20 do
+        printfn "iter: %A" i 
+        round2 testMonkeys2
+    visitedItems
+    |> Array.toList
+    |> List.mapi (fun i visited -> (i, visited))
+    |> List.sortByDescending (fun (i, tot) -> tot)
+    |> List.take 2
+    // |> fun l -> (snd l[0]) * (snd l[1])
+
 
 (*
 let monkeyItems: bigint list array  = [|
@@ -290,7 +390,7 @@ let round2 round monkeys =
     |> fun l -> int64(snd l[0]) * int64(snd l[1])
 *)
 
-let task2 = "task 2"
+// let task2 = "task 2"
 
 printfn $"Task 1: {task1}" // 100345
 printfn $"Task 2: {task2}"
