@@ -57,5 +57,5 @@ let task1 =
     readFile ()
 let task2 = "task 2"
 
-printfn $"Task 1: {task1}" // 1777 too low
+printfn $"Task 1: {task1}" // 1061, 1777 too low
 printfn $"Task 2: {task2}"
