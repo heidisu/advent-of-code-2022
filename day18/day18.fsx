@@ -30,19 +30,7 @@ let task1 =
     |> List.map (sides triples)
     |> List.sum
 
-let inside (triples: (int * int * int) list)  (x, y, z) = 
-    let xTrapped = 
-        List.exists (fun (a, b, c) -> a < x && b = y && c = z) triples && 
-        List.exists (fun (a, b, c) -> a > x && b = y && c = z) triples
-    let yTrapped = 
-        List.exists (fun (a, b, c) -> b < y && a = x && c = z) triples && 
-        List.exists (fun (a, b, c) -> b > y && a = x && c = z) triples
-    let zTrapped = 
-        List.exists (fun (a, b, c) -> c < z && b = y && a = x) triples && 
-        List.exists (fun (a, b, c) -> c > z && b = y && a = x) triples
-    xTrapped  && yTrapped && zTrapped
-
-let sides2 triples (x, y, z) = 
+let inGroup ((x, y, z): int * int * int) (group: (int * int * int) Set) =
     let candidates = [
         (x - 1, y, z)
         (x + 1, y, z)
@@ -51,9 +39,25 @@ let sides2 triples (x, y, z) =
         (x, y, z - 1)
         (x, y, z + 1)
     ]
-    triples
-    |> List.filter (fun t -> List.contains t candidates)
-    |> List.length         
+    let nb = 
+        group
+        |> Set.exists (fun pt -> candidates |> List.contains pt)
+    if nb then (true, Set.add (x, y, z) group) else (false, group)
+
+let group (groups: (int * int * int) Set list) (pt: int * int * int) =
+    let newGroups = 
+        groups
+        |> List.map (inGroup  pt)
+    let unchanged = 
+        newGroups 
+        |> List.filter (fun (inGroup, gr) -> inGroup = false) 
+        |> List.map snd
+    let changed =
+        newGroups 
+        |> List.filter (fun (inGroup, gr) -> inGroup = true) 
+        |> List.map snd
+        |> List.fold (fun acc s -> Set.union s acc) (Set.singleton pt)
+    changed :: unchanged
 
 let task2 =
     let triples = readFile ()
@@ -69,40 +73,23 @@ let task2 =
         triples
         |> List.map (fun (x, y, z) -> z) 
         |> List.max   
-    let array = Array3D.create (xMax + 1) (yMax + 1) (zMax + 1) 0
+    let array = Array3D.create (xMax + 2) (yMax + 2) (zMax + 2) 0
     triples
     |> List.iter (fun (x, y, z) -> array[x, y, z] <- 1)
-    let mutable insides = []
-    for x in 0 .. xMax do
-        for y in 0 .. yMax do
-            for z in 0 .. zMax do 
+    let mutable zeroes = []
+    for x in 0 .. xMax + 1 do
+        for y in 0 .. yMax + 1 do
+            for z in 0 .. zMax + 1 do 
                 let curr = array[x, y, z]
-                if curr =  0 && inside triples (x, y, z) then
-                    printfn "%A" (x, y, z)
-                    //insides <- (x, y, z) :: insides
-                    array[x, y, z] <- 1
-    for x in 0 .. xMax do
-        for y in 0 .. yMax do
-            for z in 0 .. zMax do 
-                let curr = array[x, y, z]
-                if inside triples (x, y, z) then
-                    insides <- (x, y, z) :: insides
-    //let insideSum = insides |> List.map (sides2 triples) |>List.sum
-    let outsides = 
-        triples
-        |> Set.ofList
-        |> Set.difference (Set.ofList insides)
-        |> Set.toList
-    let totals = 
-        triples
-        |> Set.ofList
-        |> Set.union (Set.ofList insides)
-        |> Set.toList
-    printfn "Outsides: %A (%A %A)" (List.length outsides) (List.length triples) (List.length totals)
-    totals
-    |> List.map (sides totals)
-    |> List.sum
-    //task1 - insideSum
+                if curr =  0 then
+                    zeroes <- (x, y, z) :: zeroes
 
+    let groups = List.fold (fun acc pt -> group acc pt) [] zeroes
+    let setWithoutOrigin = groups |> List.filter (fun s -> Set.contains (0,0,0)s |> not)
+    let total = triples @ (List.collect (Set.toList) setWithoutOrigin)
+    total
+    |> List.map (sides total)
+    |> List.sum
+    
 printfn $"Task 1: {task1}" // 4604 
-printfn $"Task 2: {task2}" // 4298 too high 4278 too high 4274 too high // 2592 er feil // 2594 er feil // 3107 feil // 2596 feil
+printfn $"Task 2: {task2}" // 2604
