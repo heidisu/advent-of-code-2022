@@ -123,11 +123,9 @@ let round (arr: char [,]) elves (dir: Dir) =
 
 let task1 =
     let (arr, elves) = readFile 10
-    print arr
     let (res, mv, dir) = 
         [1 .. 10]
         |> List.fold (fun (arr, actualMoves, dir) i -> round arr actualMoves dir) (arr, elves, North)
-    print res
     let mutable elves = []
     res
     |> Array2D.iteri (fun x y c -> 
