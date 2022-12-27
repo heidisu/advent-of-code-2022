@@ -20,26 +20,37 @@ let parse (str: string) =
     let root = jObj.RootElement
     parseElement root
          
-printfn "%A" (parse "[[]]")
-printfn "%A" (parse "[1, 2, [3]]")
-
 let rec compare left right = 
-    printfn "%A %A" left right
     match (left, right) with
-    | Number m, Number n -> if m <= n then true else false
+    | Number m, Number n -> if m <= n then Some true else Some false
     | ItemList l1, ItemList l2 -> 
         match l1, l2 with
-        | [], [] -> true
-        | _, [] -> false
-        | [], _ -> true
+        | [], [] -> None
+        | _, [] -> Some false
+        | [], _ -> Some true
         | Number m :: xs, Number n :: ys -> 
-            if m < n then true else if m > n then false else compare (ItemList xs) (ItemList ys)
+            if m < n then Some true else if m > n then Some false else compare (ItemList xs) (ItemList ys)
         | x :: xs, y :: ys ->
-            if compare x y then compare (ItemList xs) (ItemList ys) else false
+            match compare x y with
+            | None -> compare (ItemList xs) (ItemList ys)
+            | x -> x
     | Number n, ItemList l -> compare (ItemList [Number n] ) (ItemList l)
     | ItemList l, Number n -> compare (ItemList l) (ItemList [Number n])
 
-let readFile () = 
+let a = parse "[[[]]]"
+let b = parse "[[]]"
+printfn "compare %A" (compare b a)
+
+let rec bubbleSort (arr: Packet array) =
+    let prev = Array.copy arr
+    for i in 0 .. Array.length arr - 2 do
+        if compare arr[i] arr[i + 1] = Some false then
+            let tmp = arr[i]
+            arr[i] <- arr[i + 1]
+            arr[i + 1] <- tmp
+    if prev = arr then arr else bubbleSort arr
+
+let task1 = 
     File.ReadLines "input.txt"
     |> Seq.toList
     |> List.fold (fun (acc, prev) l -> 
@@ -49,13 +60,24 @@ let readFile () =
     |> fst
     |> List.map (fun l -> (List.item 0 l |> parse, List.item 1 l |> parse))
     |> List.mapi (fun i (a, b) -> (i + 1, compare a b))
-    |> List.filter (fun (i, b) -> b = true)
-    |> List.map (fun (i, b) -> i)
+    |> List.filter (fun (i, b) -> b = Some true)
+    |> List.map fst
     |> List.fold (fun acc n -> n + acc) 0 
 
-let task1 = 
-    readFile ()
-let task2 = "task 2"
+let task2 =
+    let div1  = parse "[[2]]"
+    let div2 = parse "[[6]]"
+    let packets = 
+        File.ReadLines "input.txt"
+        |> Seq.toList
+        |> List.filter (fun l -> l <> "")
+        |> List.map parse
+        |> fun l -> l @ [div1; div2]
+        |> List.toArray
+    bubbleSort packets |> ignore
+    let idx1 = Array.findIndex (fun p -> p = div1) packets + 1
+    let idx2 = Array.findIndex (fun p -> p = div2) packets + 1
+    idx1 * idx2
 
-printfn $"Task 1: {task1}" // 1061, 1777 too low
-printfn $"Task 2: {task2}"
+printfn $"Task 1: {task1}" // 6420
+printfn $"Task 2: {task2}" // 22000
