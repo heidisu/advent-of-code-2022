@@ -107,4 +107,4 @@ let task2 =
     fill2 arr
 
 printfn $"Task 1: {task1}" // 1016
-printfn $"Task 2: {task2}" // 15402
+printfn $"Task 2: {task2}" // 25402
