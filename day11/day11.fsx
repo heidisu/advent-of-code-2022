@@ -91,13 +91,30 @@ type Monkey2 = {
     IfFalse: int
 }
 
-let primeFactors: Dictionary<int, Map<int, int>> = Dictionary()
+let primeFactors: Dictionary<int64, Map<int64, int>> = Dictionary()
 
-let rec factorize (acc: int list) (num: int) (div: int) = 
+let factorize2 (num: int64) =
+    let mutable (factors: int64 list) = []
+    let mutable n = num
+    while n % 2L = 0 do
+        factors <- 2L :: factors
+        n <- n / 2L
+    let mutable d = 3L
+    while d <= (int64 (sqrt(float n))) + 1L do
+        while n % d = 0 do
+            factors <- d :: factors
+            n <- n / d
+        d <- d + 1L
+    if n > 2 then 
+        factors <- n :: factors
+    factors
+
+
+let rec factorize (acc: int64 list) (num: int64) (div: int64) = 
     if div > num then acc 
     else
         if num % div = 0 then factorize (div :: acc) (num / div) div
-        else factorize acc num (div  + 1)
+        else factorize acc num (div  + 1L)
 
 let rec bigFactor (acc: int list) (num: bigint) (div: bigint) = 
     if div > num then acc 
@@ -108,24 +125,24 @@ let rec bigFactor (acc: int list) (num: bigint) (div: bigint) =
 printfn "%A" (factorize [] 74 2)
 printfn "%A" (factorize [] 2356 2)
 
-let getOrAddPrime num : Map<int, int> = 
+let getOrAddPrime num : Map<int64, int> = 
     if primeFactors.ContainsKey num then primeFactors.Item num 
     else 
         let factors = 
-            factorize [] num 2
+            factorize2 num
             |> List.groupBy id
             |> List.map (fun (n, l) -> (n, List.length l))
             |> Map.ofList
         primeFactors.Add(num, factors)
         factors
 
-let add (num: int) (mp: Map<int, int>) = 
+let add (num: int) (mp: Map<int64, int>) = 
     printfn "before: %A" mp
-    let factors = factorize  [] num 2
+    let factors = factorize2 num
     let mutable remainingFactors = []
     let newMp = 
         factors
-        |> List.fold (fun(m: Map<int, int>) k -> 
+        |> List.fold (fun(m: Map<int64, int>) k -> 
             if m.ContainsKey k then
                 let v = m.Item k
                 m.Add(k, (v - 1))
@@ -141,7 +158,7 @@ let add (num: int) (mp: Map<int, int>) =
     let total = mptoInt + (List.fold (fun a n -> a * (int64 n)) 1L remainingFactors)
     let tot = int total
     if total <> int64 tot then printfn "HJELP!!!!!!!!"
-    let res = getOrAddPrime tot
+    let res = getOrAddPrime total
     //printfn "after: %A factors: %A remainingFactors: %A res: %A" newMp factors remainingFactors res
     res
     (*let mpToBigint =
@@ -219,7 +236,7 @@ let play2 (monkey: Monkey2) =
     let num = items.Length
     items
     |> List.iter (fun i -> 
-        let worryLevel: Map<int, int> = 
+        let worryLevel: Map<int64, int> = 
             match  monkey.Operation with
             | Double -> i |> Map.toList |> List.map (fun (n, i) -> (n, 2 * i)) |> Map.ofList
             | Multiply m -> 
