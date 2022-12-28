@@ -120,8 +120,30 @@ let getOrAddPrime num : Map<int, int> =
         factors
 
 let add (num: int) (mp: Map<int, int>) = 
+    printfn "before: %A" mp
     let factors = factorize  [] num 2
-    mp
+    let mutable remainingFactors = []
+    let newMp = 
+        factors
+        |> List.fold (fun(m: Map<int, int>) k -> 
+            if m.ContainsKey k then
+                let v = m.Item k
+                m.Add(k, (v - 1))
+            else 
+                remainingFactors <- k :: remainingFactors
+                m
+        ) mp
+    let mptoInt =
+        newMp
+        |> Map.toList
+        |> List.map (fun (a, b) ->  pown a b)
+        |> List.fold (fun s a -> s * (int64 a)) 1L
+    let total = mptoInt + (List.fold (fun a n -> a * (int64 n)) 1L remainingFactors)
+    let tot = int total
+    if total <> int64 tot then printfn "HJELP!!!!!!!!"
+    let res = getOrAddPrime tot
+    //printfn "after: %A factors: %A remainingFactors: %A res: %A" newMp factors remainingFactors res
+    res
     (*let mpToBigint =
         mp
         |> Map.toList
@@ -207,11 +229,12 @@ let play2 (monkey: Monkey2) =
                     | None -> Some 1
                     ) i
             | Add n -> add n i
+        // printfn "i: %A worrylevel: %A op: %A" i worryLevel monkey.Operation
         let toMonkey = if worryLevel.ContainsKey monkey.Test then monkey.IfTrue else monkey.IfFalse
         monkeyItems[toMonkey] <- monkeyItems[toMonkey] @ [worryLevel]
     )
     monkeyItems[monkey.Id] <- []
-    visitedItems[monkey.Id] <- visitedItems[monkey.Id] + num
+    visitedItems2[monkey.Id] <- visitedItems2[monkey.Id] + num
 
 let round2 (monkeys: Monkey2 array) = 
     for i in 0 .. Array.length monkeys - 1 do
@@ -219,9 +242,10 @@ let round2 (monkeys: Monkey2 array) =
 
 let task2 =
     for i in 1 .. 20 do
-        printfn "iter: %A" i 
+        if i % 1000 = 0 then printfn "iter: %A" i 
         round2 testMonkeys2
-    visitedItems
+    printfn "%A" visitedItems2
+    visitedItems2
     |> Array.toList
     |> List.mapi (fun i visited -> (i, visited))
     |> List.sortByDescending (fun (i, tot) -> tot)
