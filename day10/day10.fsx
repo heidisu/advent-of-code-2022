@@ -30,11 +30,10 @@ let task1 =
     |> snd
 
 let print (clock, x) = 
-    let rem = clock % 40 
-    let xPos = if rem = 0 then 39 else rem - 1
+    let xPos = (clock - 1) % 40 
     let symbol = if xPos = x - 1 || xPos = x || xPos = x + 1 then "#" else "."
     printf $"{symbol}"
-    if rem = 0 then printfn ""
+    if xPos = 39 then printfn ""
 
 let task2 =
     cycles
