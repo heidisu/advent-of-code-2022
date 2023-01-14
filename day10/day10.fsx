@@ -16,15 +16,15 @@ let execute clock x acc (l: string) =
 let cycles = 
     readFile ()
     |> List.fold (fun (clock, x, acc) l -> execute clock x acc l) (1, 1, [])
-    |> fun (clock, x, acc) -> acc 
+    |> fun (_, _, acc) -> acc 
     |> List.rev
 
 let task1 =
     cycles
     |> List.fold (fun (next, acc) (clock, x) ->
             if clock = next then
-                let prod = int64(clock * x)
-                (next + 40, acc + prod)
+                let strength = int64(clock * x)
+                (next + 40, acc + strength)
             else (next, acc)
         ) (20, 0L)
     |> snd
