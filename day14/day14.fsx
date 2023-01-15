@@ -49,62 +49,42 @@ let rec drip (arr: char [,]) maxX maxY (x: int, y: int) =
                         Some (x, y)
         else drip arr maxX maxY (x, y + 1) 
 
-let rec fill arr = 
+let fill arr (dripCondition: option<int * int> -> bool)  = 
     let maxX = Array2D.length1 arr
     let maxY = Array2D.length2 arr
     [ 1 .. 100000 ]
-    |> List.skipWhile (fun _ -> Option.isSome <| drip arr maxX maxY (500, 0))
+    |> List.skipWhile (fun _ -> dripCondition <| drip arr maxX maxY (500, 0))
     |> List.head
-    |> fun x -> x - 1
-
-let rec fill2 arr = 
-    let maxX = Array2D.length1 arr
-    let maxY = Array2D.length2 arr
-    [ 1 .. 100000 ]
-    |> List.skipWhile (fun i -> drip arr maxX maxY (500, 0) <> Some (500, 0))
-    |> List.head
-    |> fun x -> x
 
 let createArray tuples  =
-    let maxHeight = 
+    let (maxHeight, maxWidth) = 
         tuples
         |> List.concat
-        |> List.map fst
-        |> List.max
-    let maxWidth = 
-        tuples
-        |> List.concat
-        |> List.map snd
-        |> List.max
+        |> List.fold (fun (mh, mw) (x, y) -> (max mh x, max mw y)) (0, 0)
     let arr = Array2D.create (maxHeight + 1)(maxWidth + 1) '.'
     tuples
     |> List.map (List.windowed 2)
     |> List.iter (fun l -> l |> List.iter (fun w -> 
         insertRock arr w[0] w[1]
     ))
-    arr
+    arr 
 
 
 let task1 =
     let tuples = readFile()
     let arr = createArray tuples
-    fill arr
+    let result = fill arr (fun drip -> drip |> Option.isSome)
+    result - 1
 
 let task2 =
     let tuples = readFile ()
-    let maxHeight = 
+    let (maxHeight, maxWidth) = 
         tuples
         |> List.concat
-        |> List.map fst
-        |> List.max
-    let maxWidth = 
-        tuples
-        |> List.concat
-        |> List.map snd
-        |> List.max
+        |> List.fold (fun (mh, mw) (x, y) -> (max mh x, max mw y)) (0, 0)
     let newTuples = [(0, maxWidth + 2); (maxHeight + 400, maxWidth + 2)] :: tuples
     let arr = createArray newTuples
-    fill2 arr
+    fill arr (fun drip -> drip <> Some(500, 0))
 
 printfn $"Task 1: {task1}" // 1016
 printfn $"Task 2: {task2}" // 25402
