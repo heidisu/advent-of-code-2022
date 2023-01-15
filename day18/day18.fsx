@@ -10,7 +10,8 @@ let readFile () =
     |> Seq.toList
     |> List.map parse
 
-let sides triples (x, y, z) = 
+
+let uncoveredSides triples (x, y, z) = 
     let candidates = [
         (x - 1, y, z)
         (x + 1, y, z)
@@ -27,22 +28,16 @@ let sides triples (x, y, z) =
 let task1 = 
     let triples = readFile ()
     triples
-    |> List.map (sides triples)
+    |> List.map (uncoveredSides triples)
     |> List.sum
 
+printfn $"Task 1: {task1}" // 4604 
+
 let inGroup ((x, y, z): int * int * int) (group: (int * int * int) Set) =
-    let candidates = [
-        (x - 1, y, z)
-        (x + 1, y, z)
-        (x, y - 1, z)
-        (x, y + 1, z)
-        (x, y, z - 1)
-        (x, y, z + 1)
-    ]
-    let nb = 
+    let isNeighbour = 
         group
-        |> Set.exists (fun pt -> candidates |> List.contains pt)
-    if nb then (true, Set.add (x, y, z) group) else (false, group)
+        |> Set.exists (fun (a, b, c) -> abs(a - x) + abs(b - y) + abs (c - z) = 1)
+    if isNeighbour then (true, Set.add (x, y, z) group) else (false, group)
 
 let group (groups: (int * int * int) Set list) (pt: int * int * int) =
     let newGroups = 
@@ -61,35 +56,25 @@ let group (groups: (int * int * int) Set list) (pt: int * int * int) =
 
 let task2 =
     let triples = readFile ()
-    let xMax = 
+    let (xMax, yMax, zMax) = 
         triples
-        |> List.map (fun (x, y, z) -> x)
-        |> List.max 
-    let yMax = 
-        triples
-        |> List.map (fun (x, y, z) -> y)
-        |> List.max
-    let zMax = 
-        triples
-        |> List.map (fun (x, y, z) -> z) 
-        |> List.max   
-    let array = Array3D.create (xMax + 2) (yMax + 2) (zMax + 2) 0
-    triples
-    |> List.iter (fun (x, y, z) -> array[x, y, z] <- 1)
-    let mutable zeroes = []
-    for x in 0 .. xMax + 1 do
-        for y in 0 .. yMax + 1 do
-            for z in 0 .. zMax + 1 do 
-                let curr = array[x, y, z]
-                if curr =  0 then
-                    zeroes <- (x, y, z) :: zeroes
+        |> List.fold(
+            fun (mx, my, mz) (x, y, z) -> 
+            (max x mx, max y my, max z mz)) (0, 0, 0)
+ 
+    let zeroes = 
+        [0 .. zMax + 2]
+        |> List.allPairs [0 .. yMax + 2]
+        |> List.allPairs [0 .. xMax + 2]
+        |> List.map (fun (x, (y, z)) -> (x, y, z))
+        |> List.filter (fun pt ->
+            triples |> List.contains pt |> not)
 
     let groups = List.fold (fun acc pt -> group acc pt) [] zeroes
     let setWithoutOrigin = groups |> List.filter (fun s -> Set.contains (0,0,0)s |> not)
     let total = triples @ (List.collect (Set.toList) setWithoutOrigin)
     total
-    |> List.map (sides total)
+    |> List.map (uncoveredSides total)
     |> List.sum
     
-printfn $"Task 1: {task1}" // 4604 
 printfn $"Task 2: {task2}" // 2604
